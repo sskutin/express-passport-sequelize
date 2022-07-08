@@ -1,0 +1,23 @@
+{
+  "name": "node-passport-sequelize",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "1.4.6",
+    "debug": "2.6.9",
+    "express": "4.16.4",
+    "express-session": "1.17.3",
+    "morgan": "1.9.1",
+    "mysql2": "2.3.3",
+    "passport": "0.6.0",
+    "passport-local": "1.0.0",
+    "sequelize": "6.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.19"
+  }
+}
