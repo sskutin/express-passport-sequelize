@@ -1,6 +1,6 @@
 # node-passport-sequelize
 
-###Application uses
+### Application uses
 - `express` as a web framework
 - `passportjs` for authentication 
 - `sequelize` for db interaction
