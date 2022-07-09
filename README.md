@@ -1,4 +1,4 @@
-# node-passport-sequelize
+# express-passport-sequelize
 
 ### Application uses
 - `express` as a web framework
