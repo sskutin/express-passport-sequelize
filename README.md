@@ -17,6 +17,7 @@ Environment is configured in `.dev.development`, `.dev.production`, `.env.test` 
 _PS. Ensure you have docker installed on your machine before running the application_
 ### Run in production mode
 ```
+yarn
 yarn docker:up
 ```
 
