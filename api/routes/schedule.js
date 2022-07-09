@@ -6,6 +6,7 @@ const Permissions = require('../../permissions/permissions');
 const scheduleService = require('../../services/schedule-service');
 const asyncHandler = require("../async-handler");
 const BadRequestError = require('../../errors/bad-request-error');
+const validateDateRange = require("../utils/validate-date-range");
 
 router.get('/', isAuthorized(Permissions.Schedule.Read), asyncHandler(async (req, res, next) => {
     const userId = req.query.userId || req.user.id;
@@ -13,6 +14,10 @@ router.get('/', isAuthorized(Permissions.Schedule.Read), asyncHandler(async (req
 
     if (!fromDate || !toDate) {
         throw new BadRequestError("Missing required parameters");
+    }
+
+    if (!validateDateRange({ fromDate, toDate })) {
+        throw new BadRequestError("Wrong date range");
     }
 
     res.status(200).json(await scheduleService.getSchedules({ userId, fromDate, toDate }));
@@ -40,7 +45,7 @@ router.delete('/:id', isAuthorized(Permissions.Schedule.CRUD), asyncHandler(asyn
     const id = req.params.id;
 
     await scheduleService.deleteSchedule(id);
-    res.status(200).end();
+    res.status(204).end();
 }));
 
 module.exports = router;

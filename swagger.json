@@ -1,0 +1,582 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "node-passport-sequelize",
+    "version": "0.0.1",
+    "description": "Backend application for the staff scheduling system"
+  },
+  "paths": {
+    "/v1/users": {
+      "get": {
+        "summary": "/v1/users",
+        "description": "Returns list of all users, ordering available. Accessible for `Role.Admin`",
+        "parameters": [
+          {
+            "description": "order, only available `workHours` for now",
+            "in": "query",
+            "name": "orderBy",
+            "schema": {
+              "type": "string",
+              "example": "workHours",
+              "enum": [
+                "workHours"
+              ]
+            }
+          },
+          {
+            "description": "from date, required if `orderBy=workHours`, format `yyyy-mm-dd`, max date range - 365 days",
+            "in": "query",
+            "name": "fromDate",
+            "schema": {
+              "type": "string",
+              "example": "2022-01-01"
+            }
+          },
+          {
+            "description": "to date, required if `orderBy=workHours`, format `yyyy-mm-dd`, max date range - 365 days",
+            "in": "query",
+            "name": "toDate",
+            "schema": {
+              "type": "string",
+              "example": "2022-12-31"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "number"
+                      },
+                      "totalShiftLength": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "username",
+                      "role"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "summary": "/v1/users",
+        "description": "Create new user. Accessible for `Role.Admin`",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username",
+                    "required": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password",
+                    "required": true
+                  },
+                  "role": {
+                    "description": "Role for the user, `Role.Staff=0`, `Role.Admin=1`",
+                    "type": "number",
+                    "example": 0,
+                    "default": 0,
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 2
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "username"
+                    },
+                    "role": {
+                      "type": "number",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/{id}": {
+      "put": {
+        "summary": "/v1/users/{id}",
+        "description": "Updates the user with given ID. Accessible for `Role.Admin`",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password"
+                  },
+                  "role": {
+                    "description": "Role for the user, `Role.Staff=0`, `Role.Admin=1`",
+                    "type": "number",
+                    "example": 0,
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 2
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "username2"
+                    },
+                    "role": {
+                      "type": "number",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "summary": "/v1/users/{id}",
+        "description": "Delete the user with given ID. Accessible for `Role.Admin`",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/session": {
+      "post": {
+        "summary": "/v1/session",
+        "description": "Logs the user in",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username",
+                    "required": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password",
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Session"
+        ]
+      },
+      "delete": {
+        "summary": "/v1/session",
+        "description": "Logs the user out",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/schedule": {
+      "get": {
+        "summary": "/v1/schedule",
+        "description": "Returns the schedule for current or given user. Available for `Roles.Staff`, `Roles.Admin`",
+        "parameters": [
+          {
+            "description": "target user id",
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "description": "from date, format `yyyy-mm-dd`, max date range - 365 days",
+            "in": "query",
+            "name": "fromDate",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "2022-01-01"
+            }
+          },
+          {
+            "description": "to date, format `yyyy-mm-dd`, max date range - 365 days",
+            "in": "query",
+            "name": "toDate",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "2022-12-31"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "userId": {
+                        "type": "number"
+                      },
+                      "workDate": {
+                        "type": "string"
+                      },
+                      "shiftLength": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Schedule"
+        ]
+      },
+      "post": {
+        "summary": "/v1/schedule",
+        "description": "Creates schedule for user. Accessible for `Role.Admin`",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "number",
+                    "example": 1,
+                    "required": true
+                  },
+                  "workDate": {
+                    "description": "format `yyyy-mm-dd`",
+                    "type": "string",
+                    "example": "2022-12-31",
+                    "required": true
+                  },
+                  "shiftLength": {
+                    "type": "number",
+                    "description": "length in hours, between `1` and `24`",
+                    "example": 8,
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "userId": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "workDate": {
+                      "type": "string",
+                      "example": "2022-12-30"
+                    },
+                    "shiftLength": {
+                      "type": "number",
+                      "example": 8
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
+    "/v1/schedule/{id}": {
+      "put": {
+        "summary": "/v1/schedule/{id}",
+        "description": "Update the schedule by ID. Accessible for `Role.Admin`",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workDate": {
+                    "description": "format `yyyy-mm-dd`",
+                    "type": "string",
+                    "example": "2022-12-31"
+                  },
+                  "shiftLength": {
+                    "type": "number",
+                    "description": "length in hours, between `1` and `24`",
+                    "example": 8
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of the schedule to update",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 3
+                    },
+                    "userId": {
+                      "type": "number",
+                      "example": 2
+                    },
+                    "workDate": {
+                      "type": "string",
+                      "example": "2022-12-30"
+                    },
+                    "shiftLength": {
+                      "type": "number",
+                      "example": 12
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Schedule"
+        ]
+      },
+      "delete": {
+        "summary": "/v1/schedule/{id}",
+        "description": "Delete the schedule by ID. Accessible for `Role.Admin`",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
+    "/v1/sign-up": {
+      "post": {
+        "summary": "/v1/sign-up",
+        "description": "Sign up, user get logged in automatically",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username",
+                    "required": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password",
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 3
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "username3"
+                    },
+                    "role": {
+                      "type": "number",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Sign Up"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

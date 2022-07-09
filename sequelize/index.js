@@ -5,8 +5,11 @@ const config = require('../config');
 const { applyExtraSetup } = require("./extra-setup");
 const Roles = require("../permissions/roles");
 
+const { NODE_ENV } = process.env;
 const { host, port, user, password, database } = config.database;
-const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+const sequelize = new Sequelize(database, user, password, { dialect: 'mysql', host });
+
+const isDev = NODE_ENV === "development";
 
 (async () => {
     const connection = await mysql.createConnection({ host, port, user, password });
@@ -22,10 +25,13 @@ const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
 
     applyExtraSetup(sequelize);
 
-    await sequelize.sync({ force: true }); // TODO: remove
+    await sequelize.sync({ force: isDev });
 
     // Creating default admin user
-    await sequelize.models.user.create({ username: "admin", password: "password", role: Roles.Admin });
+    const adminUser = await sequelize.models.user.findOne({ where: { username: "admin" } });
+    if (!adminUser) {
+        await sequelize.models.user.create({ username: "admin", password: "password", role: Roles.Admin });
+    }
 })();
 
 module.exports = sequelize;

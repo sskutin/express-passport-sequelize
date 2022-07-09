@@ -3,8 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www"
+    "start": "env-cmd -f ./.env.production node ./bin/www",
+    "dev": "env-cmd -f ./.env.development nodemon ./bin/www",
+    "test": "env-cmd -f ./.env.test jest",
+    "docker:db": "docker run --name node-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql",
+    "docker:up": "docker-compose up"
   },
   "dependencies": {
     "cookie-parser": "1.4.6",
@@ -15,9 +18,18 @@
     "mysql2": "2.3.3",
     "passport": "0.6.0",
     "passport-local": "1.0.0",
-    "sequelize": "6.21.2"
+    "sequelize": "6.21.2",
+    "swagger-ui-express": "4.4.0"
   },
   "devDependencies": {
+    "env-cmd": "10.1.0",
+    "jest": "28.1.2",
     "nodemon": "2.0.19"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
