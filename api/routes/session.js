@@ -6,22 +6,22 @@ const AuthenticationError = require('../../errors/authentication-error');
 
 const authenticate = passport.authenticate('local', { failureMessage: true });
 
-router.post('/', authenticate, (req, res, next) => {
-    res.status(200).end();
+router.post('/', authenticate, (req, res) => {
+  res.status(200).end();
 });
 
-router.delete('/', (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        throw new AuthenticationError();
+router.delete('/', (req, res) => {
+  if (!req.isAuthenticated()) {
+    throw new AuthenticationError();
+  }
+
+  req.logout((err) => {
+    if (err) {
+      throw new AuthenticationError(err.message);
     }
+  });
 
-    req.logout((err) => {
-        if (err) {
-            throw new AuthenticationError(err.message);
-        }
-    });
-
-    res.status(204).end();
+  res.status(204).end();
 });
 
 module.exports = router;

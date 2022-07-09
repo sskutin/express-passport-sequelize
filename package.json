@@ -6,6 +6,7 @@
     "start": "env-cmd -f ./.env.production node ./bin/www",
     "dev": "env-cmd -f ./.env.development nodemon ./bin/www",
     "test": "env-cmd -f ./.env.test jest",
+    "eslint:fix": "eslint . --fix --cache",
     "docker:db": "docker run --name node-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql",
     "docker:up": "docker-compose up"
   },
@@ -23,8 +24,12 @@
   },
   "devDependencies": {
     "env-cmd": "10.1.0",
+    "eslint": "^8.2.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.2.1",
     "jest": "28.1.2",
-    "nodemon": "2.0.19"
+    "nodemon": "2.0.19",
+    "prettier": "2.7.1"
   },
   "jest": {
     "testEnvironment": "node",

@@ -6,7 +6,7 @@ const swaggerUi = require('swagger-ui-express');
 
 const swaggerDocument = require('./swagger.json');
 const config = require('./config');
-const passport = require("./passport");
+const passport = require('./passport');
 const usersRouter = require('./api/routes/users');
 const sessionRouter = require('./api/routes/session');
 const scheduleRouter = require('./api/routes/schedule');
@@ -19,7 +19,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(session({ secret: config.session.secret, resave: true, saveUninitialized: true }));
+app.use(
+  session({
+    secret: config.session.secret,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -31,10 +37,12 @@ app.use('/v1/sign-up', signUpRouter);
 app.use('/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Error handler
-app.use((err, req, res, next) => {
-    console.error(err);
-    const status = err.status || 500;
-    res.status(status).send({ message: err.message || "Internal Server Error", status });
+app.use((err, req, res) => {
+  console.error(err);
+  const status = err.status || 500;
+  res
+    .status(status)
+    .send({ message: err.message || 'Internal Server Error', status });
 });
 
 module.exports = app;
